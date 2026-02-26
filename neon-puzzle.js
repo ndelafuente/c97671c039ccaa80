@@ -1,4 +1,3 @@
-const responses = [];
 const crewManifest = {};
 
 function startPuzzle() {
@@ -135,7 +134,6 @@ async function handleChallenge(socket, fragments) {
  */
 function sendResponse(socket, type, message) {
     const send = (o) => socket.send(JSON.stringify(o));
-    responses.push(message);
     switch (type) {
         case "enter_digits":
             let digits = message;
