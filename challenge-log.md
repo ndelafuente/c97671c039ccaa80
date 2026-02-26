@@ -12,3 +12,4 @@
 
 ## Notes
 - "transmit" is not exclusive to `speak_text`
+- Wikipedia API endpoints may be changing in late 2026 

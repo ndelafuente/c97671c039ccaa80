@@ -1,5 +1,6 @@
+const responses = [];
+
 function startPuzzle() {
-    const vars = { CHECKPOINT: 0 };
     let socket = new WebSocket("wss://neonhealth.software/agent-puzzle/challenge");
     socket.onopen = () => { console.log("Connected") };
     socket.onmessage = (event) => { handleMessage(socket, event.data, vars) };
@@ -11,19 +12,17 @@ function startPuzzle() {
  * Handle a message from NEON
  * @param {WebSocket} socket The web socket
  * @param {string} message Expected to be a stringified JSON object
- * @param {{CHECKPOINT: number}} vars Variables accessible across calls
  */
-function handleMessage(socket, message, vars) {
+async function handleMessage(socket, message) {
     const parsedMessage = JSON.parse(message)
     console.debug("Parsed message", parsedMessage);
 
     switch (parsedMessage['type']) {
         case "challenge":
-            handleChallenge(socket, parsedMessage['message']);
+            await handleChallenge(socket, parsedMessage['message']);
             return;
         case "success":
-            console.log(`Checkpoint ${vars.CHECKPOINT} passed!`);
-            vars.CHECKPOINT += 1;
+            console.log(`Access granted!`);
             return;
         case "error":
             throw new Error("Submission rejected: " + parsedMessage['message']);
@@ -36,7 +35,7 @@ function handleMessage(socket, message, vars) {
  * @param {WebSocket} socket The web socket
  * @param {Object[]} fragments a scrambled list of timestamped words
  */
-function handleChallenge(socket, fragments) {
+async function handleChallenge(socket, fragments) {
     fragments.sort((a, b) => a['timestamp'] - b['timestamp']);
     const prompt = fragments.map(fragment => fragment['word']).join(' ');
     console.debug("Prompt:", prompt);
@@ -91,6 +90,7 @@ function handleChallenge(socket, fragments) {
  */
 function sendResponse(socket, type, message) {
     const send = (o) => socket.send(JSON.stringify(o));
+    responses.push(message);
     switch (type) {
         case "enter_digits":
             let digits = message;
