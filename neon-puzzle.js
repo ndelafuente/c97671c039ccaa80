@@ -23,8 +23,10 @@ function handleMessage(message) {
 
 /**
  * Handle a challenge from NEON
- * @param {Array[Object]} fragments 
+ * @param {Object[]} fragments a scrambled list of timestamped words
  */
 function handleChallenge(fragments) {
-    
+    fragments.sort((a, b) => a['timestamp'] - b['timestamp']);
+    const unscrambled = fragments.map(fragment => fragment['word']).join(' ');
+    console.log("Unscrambled:", unscrambled);
 }
