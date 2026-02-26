@@ -62,15 +62,25 @@ async function handleChallenge(socket, fragments) {
 
         // c) Knowledge Archive Query
         case "Cross-reference the knowledge archive":
-            throw new Error("not implemented");
+            const wordIdRegex = /speak the (?<word_Idx>\d+)\w+ word in the entry summary for '(?<title>\w+)'/
+            const wordIdMatch = prompt.match(wordIdRegex)?.groups || {};
+            const word_Idx = Number.parseInt(wordIdMatch.word_Idx) - 1;
+            const { title } = wordIdMatch;
+            if (isNaN(word_Idx) || !title) throw new Error("Unable to parse knowledge request");
+            const endpoint = `https://en.wikipedia.org/api/rest_v1/page/summary/${title}`
+            const res = await fetch(endpoint);
+            if (res.status !== 200) throw new Error(`Could not fetch page ${endpoint}`)
+            const json = await res.json();
+            const word = json['extract'].split(' ')[word_Idx];
+            return sendResponse(socket, "speak_text", word);
 
         // d) Crew Manifest Transmissions
         case "Crew manifest continued":
             const charLimitRegex = /less than (\d+) total characters/
             const charLimit = Number.parseInt(prompt.match(charLimitRegex)?.[1]);
             if (!charLimit) throw new Error("Unable to parse character limit");
-            const accessJustification = "This rising pilot has spent 3 years: delivering urgent repairs and mission-critical upgrades for distributed systems, expertly navigating complex problem space, and keeping response times low as a fleet grows. Whatever the issue, he keeps the ship sailing."
-            return sendResponse(socket, "speak_text", accessJustification);
+            const accessJustification = "This rising pilot has spent 3 years delivering urgent repairs and mission-critical upgrades for distributed systems, expertly navigating complex problem space, and keeping response times low as a fleet grows. Whatever the issue, he keeps the ship sailing."
+            return sendResponse(socket, "speak_text", accessJustification)
 
         // e) Transmission Verification
         case "unknown":
