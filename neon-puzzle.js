@@ -6,6 +6,10 @@ function recieveNext() {
     socket.onclose = (event) => { console.log("Closed:", event.code, event.reason) };
 }
 
+/**
+ * Handle a message from NEON
+ * @param {string} message Expected to be a stringified JSON object
+ */
 function handleMessage(message) {
     const parsedMessage = JSON.parse(message)
     console.log("Parsed message", parsedMessage);
@@ -17,6 +21,10 @@ function handleMessage(message) {
     }
 }
 
+/**
+ * Handle a challenge from NEON
+ * @param {Array[Object]} fragments 
+ */
 function handleChallenge(fragments) {
-
+    
 }
